@@ -1,0 +1,5 @@
+# Generated files are compared byte for byte by `npm run docs:check` and `npm run agents:check`.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary

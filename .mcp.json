@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "daymaker": {
+      "type": "http",
+      "url": "https://daymaker.com/mcp"
+    }
+  }
+}

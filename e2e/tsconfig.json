@@ -1,0 +1,21 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "..",
+    "noEmit": true,
+    "allowJs": true,
+    "paths": {
+      "@daymaker/sdk": [
+        "../packages/sdk/src/index.ts"
+      ],
+      "@daymaker/mcp": [
+        "../packages/mcp/src/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "./**/*.ts",
+    "../scripts/agents.mjs",
+    "../examples/**/*.ts"
+  ]
+}

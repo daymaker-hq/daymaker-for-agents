@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "daymaker",
+  "version": "0.4.0",
+  "description": "Research leads, pick gifts they would love and send them, through the Daymaker MCP server. Sign in with your Daymaker account when the client asks.",
+  "author": {
+    "name": "Daymaker",
+    "email": "contact@daymaker.com",
+    "url": "https://daymaker.com"
+  },
+  "homepage": "https://github.com/daymaker-hq/daymaker-for-agents",
+  "repository": "https://github.com/daymaker-hq/daymaker-for-agents",
+  "license": "LicenseRef-Proprietary",
+  "keywords": [
+    "daymaker",
+    "gifts",
+    "gifting",
+    "leads",
+    "research",
+    "outreach",
+    "mcp"
+  ]
+}

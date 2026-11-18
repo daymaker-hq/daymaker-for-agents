@@ -1,0 +1,40 @@
+{
+  "$comment": "The exact files and folders of this tree. scripts/export-public.mjs copies the tracked files listed here into a new folder and scans the result.",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "THIRD-PARTY-NOTICES.md",
+    "CHANGELOG.md",
+    "server.json",
+    "package.json",
+    "package-lock.json",
+    "tsconfig.base.json",
+    "plugin.json",
+    "mcp.json",
+    "mcp_config.json",
+    ".mcp.json",
+    ".env.example",
+    "Dockerfile",
+    ".gitignore",
+    ".gitattributes",
+    ".dockerignore",
+    "vitest.config.ts",
+    "vitest.e2e.config.ts",
+    "bin/daymaker-mcp.mjs",
+    "public-files.json",
+    "spec/openapi.json",
+    ".github/workflows/ci.yml",
+    ".github/workflows/release.yml"
+  ],
+  "dirs": [
+    ".claude-plugin",
+    ".devin-plugin",
+    ".antigravity-plugin",
+    "examples",
+    "packages",
+    "scripts",
+    "skills",
+    "test",
+    "e2e"
+  ]
+}

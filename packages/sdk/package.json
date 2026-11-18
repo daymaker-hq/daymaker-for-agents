@@ -1,0 +1,45 @@
+{
+  "name": "@daymaker/sdk",
+  "version": "0.4.0",
+  "description": "Typed client for the Daymaker API (https://daymaker.com/api/v2).",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daymaker-hq/daymaker-for-agents.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://daymaker.com",
+  "bugs": "https://github.com/daymaker-hq/daymaker-for-agents/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "keywords": [
+    "daymaker",
+    "gifts",
+    "gifting",
+    "leads",
+    "sdk",
+    "api"
+  ]
+}

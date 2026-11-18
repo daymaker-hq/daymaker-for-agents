@@ -1,0 +1,28 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "daymaker",
+  "displayName": "Daymaker",
+  "version": "0.4.0",
+  "description": "Research leads, pick gifts they would love, send them and follow every order, signed in with your Daymaker account.",
+  "suggestedPrompts": [
+    "Who in my Daymaker leads has a gift ready to send?",
+    "Research this lead in Daymaker and find gift ideas for them",
+    "Show my recent Daymaker orders and where each gift stands"
+  ],
+  "author": {
+    "name": "Daymaker",
+    "url": "https://daymaker.com"
+  },
+  "homepage": "https://github.com/daymaker-hq/daymaker-for-agents",
+  "repository": "https://github.com/daymaker-hq/daymaker-for-agents",
+  "license": "LicenseRef-Proprietary",
+  "keywords": [
+    "daymaker",
+    "gifts",
+    "gifting",
+    "leads",
+    "research",
+    "outreach",
+    "mcp"
+  ]
+}

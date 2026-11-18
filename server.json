@@ -1,0 +1,54 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.daymaker/daymaker",
+  "title": "Daymaker",
+  "description": "Research leads, pick gifts they would love and send them, as you, in your Daymaker workspace.",
+  "version": "0.4.0",
+  "websiteUrl": "https://daymaker.com",
+  "repository": {
+    "source": "github",
+    "url": "https://github.com/daymaker-hq/daymaker-for-agents"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://daymaker.com/mcp"
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@daymaker/mcp",
+      "version": "0.4.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "runtimeHint": "npx",
+      "environmentVariables": [
+        {
+          "name": "DAYMAKER_KEY",
+          "description": "Daymaker API key (dmk_live_...), made in Daymaker under Settings, API and MCP. It acts as the person who made it.",
+          "isSecret": true,
+          "isRequired": true
+        },
+        {
+          "name": "DAYMAKER_API_URL",
+          "description": "The API's address.",
+          "isRequired": false,
+          "default": "https://daymaker.com/api/v2"
+        },
+        {
+          "name": "DAYMAKER_MCP_READ_ONLY",
+          "description": "Set to 1 to offer only the tools that change nothing: reads and price checks.",
+          "isRequired": false
+        },
+        {
+          "name": "DAYMAKER_MCP_SCOPES",
+          "description": "Comma-separated scopes (read, work, send) to offer only the tools your key reaches.",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}

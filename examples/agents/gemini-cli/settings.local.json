@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "daymaker-api": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@daymaker/mcp"
+      ],
+      "env": {
+        "DAYMAKER_KEY": "$DAYMAKER_KEY"
+      }
+    }
+  }
+}

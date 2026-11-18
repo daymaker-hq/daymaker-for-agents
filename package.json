@@ -1,0 +1,46 @@
+{
+  "name": "daymaker-for-agents",
+  "private": true,
+  "version": "0.4.0",
+  "description": "Daymaker for Claude Code and other agent clients: plugins, a local MCP server and a typed SDK for the Daymaker API.",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daymaker-hq/daymaker-for-agents.git"
+  },
+  "homepage": "https://daymaker.com",
+  "bugs": "https://github.com/daymaker-hq/daymaker-for-agents/issues",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/sdk",
+    "packages/mcp"
+  ],
+  "scripts": {
+    "build": "npm run build -w @daymaker/sdk && npm run build -w @daymaker/mcp",
+    "typecheck": "tsc -p packages/sdk/tsconfig.json --noEmit && tsc -p packages/mcp/tsconfig.json --noEmit && tsc -p e2e/tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "spec:generate": "node scripts/generate.mjs",
+    "spec:sync": "node scripts/generate.mjs --fetch",
+    "spec:check": "node scripts/generate.mjs --check",
+    "validate:manifests": "node scripts/validate-manifests.mjs",
+    "bundle": "node scripts/bundle.mjs",
+    "docs": "node scripts/docs.mjs",
+    "docs:check": "node scripts/docs.mjs --check",
+    "agents": "node scripts/agents.mjs",
+    "agents:check": "node scripts/agents.mjs --check",
+    "smoke:stdio": "node scripts/smoke-stdio.mjs",
+    "check:public": "node scripts/check-public.mjs",
+    "export:public": "node scripts/export-public.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "esbuild": "^0.25.12",
+    "openapi-typescript": "^7.4.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.12"
+  }
+}

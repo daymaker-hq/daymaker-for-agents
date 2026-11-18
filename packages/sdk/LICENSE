@@ -1,0 +1,29 @@
+Copyright (c) 2026 Daymaker. All rights reserved.
+
+Daymaker grants you a limited, non-exclusive, non-transferable, revocable
+license to install, run and copy this software — including the npm packages
+`@daymaker/sdk` and `@daymaker/mcp` — only to access Daymaker's services,
+subject to the Daymaker Terms of Service at https://daymaker.com/terms.
+
+You may include unmodified copies of the npm packages `@daymaker/sdk` and
+`@daymaker/mcp` as dependencies of your own applications and services that
+access Daymaker's services, and distribute them as part of those
+applications.
+
+You may not:
+
+  - redistribute this software on its own, or modified copies of it,
+  - sublicense, sell, rent or lease it,
+  - use it, or any output of it, to build or operate a service that
+    competes with Daymaker's services.
+
+You may make the changes needed to run this software in your own
+environment; those changes are covered by the same license and may not be
+redistributed.
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+DAYMAKER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

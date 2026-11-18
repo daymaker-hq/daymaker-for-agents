@@ -1,0 +1,69 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Generated SDK matches spec/
+        run: npm run spec:check
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Committed MCP bundle and its license notices are current
+        run: npm run bundle && git diff --exit-code -- bin/daymaker-mcp.mjs THIRD-PARTY-NOTICES.md
+      - name: README tool table is current
+        run: npm run docs:check
+      - name: Agent configs and README agent table are current
+        run: npm run agents:check
+      - run: npm run validate:manifests
+      - name: Bundle answers MCP initialize over stdio
+        run: npm run smoke:stdio
+      - name: Scan the tree for secrets and private details
+        run: npm run check:public
+
+  public-export:
+    # Proves the public tree (public-files.json) is clean and builds alone.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/export-public.mjs /tmp/public-export
+      - name: Build, typecheck, unit-test and validate the export
+        working-directory: /tmp/public-export
+        run: |
+          npm ci
+          npm run build
+          npm run typecheck
+          npm test
+          npm run validate:manifests
+          npm run check:public
+
+  e2e:
+    # Keyless end to end: the hosted MCP server, its OAuth metadata, every agent config, the stdio bundle.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:e2e

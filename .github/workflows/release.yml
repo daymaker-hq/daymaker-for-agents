@@ -1,0 +1,104 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  id-token: write # npm --provenance
+
+jobs:
+  publish:
+    # Publishing happens from this repository only, never from a fork or a copy.
+    if: github.repository == 'daymaker-hq/daymaker-for-agents'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - run: npm ci
+      - name: Every version equals the tag
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          for f in package.json packages/sdk/package.json packages/mcp/package.json .claude-plugin/plugin.json .claude-plugin/marketplace.json .devin-plugin/plugin.json .antigravity-plugin/plugin.json plugin.json server.json; do
+            node -e "const p=require('./$f');const v=p.version??p.metadata?.version;if(v!=='$TAG'){console.error('$f version '+(v||'missing')+' != tag $TAG');process.exit(1)}"
+          done
+          node -e "const m=require('./packages/mcp/package.json');if(m.dependencies['@daymaker/sdk']!=='$TAG'){console.error('@daymaker/mcp must depend on @daymaker/sdk $TAG');process.exit(1)}"
+          node -e "const s=require('./server.json');const p=s.packages.find(x=>x.registryType==='npm');if(p.version!=='$TAG'){console.error('server.json npm package version '+p.version+' != tag $TAG');process.exit(1)}"
+      - run: npm run spec:check
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Committed MCP bundle and its license notices are current
+        run: npm run bundle && git diff --exit-code -- bin/daymaker-mcp.mjs THIRD-PARTY-NOTICES.md
+      - run: npm run docs:check
+      - run: npm run agents:check
+      - run: npm run validate:manifests
+      - run: npm run smoke:stdio
+      - run: npm run check:public
+      # Each step below skips what is already out, so a run that stopped halfway can be run again.
+      - name: Publish @daymaker/sdk
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          if npm view "@daymaker/sdk@${TAG}" version >/dev/null 2>&1; then
+            echo "@daymaker/sdk@${TAG} is already on npm"
+          else
+            npm publish -w @daymaker/sdk --provenance --access public
+          fi
+      - name: Publish @daymaker/mcp
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          if npm view "@daymaker/mcp@${TAG}" version >/dev/null 2>&1; then
+            echo "@daymaker/mcp@${TAG} is already on npm"
+          else
+            npm publish -w @daymaker/mcp --provenance --access public
+          fi
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" --repo daymaker-hq/daymaker-for-agents >/dev/null 2>&1; then
+            echo "release ${GITHUB_REF_NAME} already exists"
+          else
+            # The notes are this version's section of the changelog.
+            TAG="${GITHUB_REF_NAME#v}"
+            awk -v v="## ${TAG}" '$0==v{on=1;next} on&&/^## /{exit} on' CHANGELOG.md > /tmp/release-notes.md
+            test -s /tmp/release-notes.md
+            gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --notes-file /tmp/release-notes.md --repo daymaker-hq/daymaker-for-agents
+          fi
+
+  registry:
+    # Publishes server.json to the MCP Registry once the npm package it names is
+    # out. The name com.daymaker/daymaker is proven by a key whose public half
+    # daymaker.com serves at /.well-known/mcp-registry-auth. Skipped while the
+    # MCP_REGISTRY_KEY secret is not set.
+    needs: publish
+    runs-on: ubuntu-latest
+    env:
+      MCP_PRIVATE_KEY: ${{ secrets.MCP_REGISTRY_KEY }}
+      PUBLISHER_VERSION: "1.8.9"
+    steps:
+      - uses: actions/checkout@v4
+        if: env.MCP_PRIVATE_KEY != ''
+      - name: Get mcp-publisher, checked against its release checksums
+        if: env.MCP_PRIVATE_KEY != ''
+        run: |
+          base="https://github.com/modelcontextprotocol/registry/releases/download/v${PUBLISHER_VERSION}"
+          curl -fsSLO "${base}/mcp-publisher_linux_amd64.tar.gz"
+          curl -fsSLO "${base}/registry_${PUBLISHER_VERSION}_checksums.txt"
+          grep " mcp-publisher_linux_amd64.tar.gz$" "registry_${PUBLISHER_VERSION}_checksums.txt" | sha256sum -c -
+          tar xzf mcp-publisher_linux_amd64.tar.gz mcp-publisher
+      - name: Publish server.json
+        if: env.MCP_PRIVATE_KEY != ''
+        # This version of mcp-publisher reads the key from the flag; newer ones also read MCP_PRIVATE_KEY.
+        run: |
+          ./mcp-publisher login http --domain daymaker.com --private-key "$MCP_PRIVATE_KEY"
+          ./mcp-publisher publish
