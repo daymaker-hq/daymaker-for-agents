@@ -4,7 +4,7 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { AGENTS, AGENTS_DIR, KEY_ENV, KEY_PLACEHOLDER, MCP_URL, NPM_PACKAGE } from "./agents.mjs";
+import { AGENTS, AGENTS_DIR, CLAUDE_PLUGIN_DIR, KEY_ENV, KEY_PLACEHOLDER, MCP_URL, NPM_PACKAGE, REMOTE_NAME } from "./agents.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const problems = [];
@@ -30,19 +30,30 @@ need(mcpPkg.name === NPM_PACKAGE, `packages/mcp must be named ${NPM_PACKAGE}; th
 need((await readFile(join(root, "packages/sdk/src/version.ts"), "utf8")).includes(`"${version}"`), `packages/sdk/src/version.ts must say ${version}`);
 need((await readFile(join(root, "CHANGELOG.md"), "utf8")).includes(`## ${version}`), `CHANGELOG.md needs a section for ${version}`);
 
-// Claude Code: .claude-plugin/plugin.json + marketplace.json + root .mcp.json
-const plugin = await read(".claude-plugin/plugin.json");
+// Claude Code: the marketplace file at the root lists the plugin, which lives in a folder of its own
+// (CLAUDE_PLUGIN_DIR) with its manifest, its server file and its skill. Claude Code copies that folder whole to the
+// person's machine, so the repository root must never be the plugin again.
+const pluginManifest = `${CLAUDE_PLUGIN_DIR}/.claude-plugin/plugin.json`;
+const plugin = await read(pluginManifest);
 const market = await read(".claude-plugin/marketplace.json");
 const mcp = await read(".mcp.json");
-need(/^[a-z0-9-]+$/.test(plugin.name ?? ""), "plugin.json: name must be kebab-case");
-need(plugin.version === version, `.claude-plugin/plugin.json version ${plugin.version} != package.json ${version}`);
-need(typeof plugin.description === "string" && plugin.description.length > 0, "plugin.json: description required");
-need(plugin.mcpServers === "./.mcp.json", "plugin.json: mcpServers must point at ./.mcp.json");
+need(/^[a-z0-9-]+$/.test(plugin.name ?? ""), `${pluginManifest}: name must be kebab-case`);
+need(plugin.version === version, `${pluginManifest} version ${plugin.version} != package.json ${version}`);
+need(typeof plugin.description === "string" && plugin.description.length > 0, `${pluginManifest}: description required`);
+// The server is in a .mcp.json of the plugin's own, a copy of the root one. Written inline in the manifest it
+// loads too, but Claude Code's plugin details then list no server.
+need(plugin.mcpServers === "./.mcp.json", `${pluginManifest}: mcpServers must point at ./.mcp.json`);
+const pluginMcp = await read(`${CLAUDE_PLUGIN_DIR}/.mcp.json`);
+const pluginServer = pluginMcp.mcpServers?.[REMOTE_NAME];
+need(pluginServer?.type === "http" && pluginServer?.url === MCP_URL, `${CLAUDE_PLUGIN_DIR}/.mcp.json: must add ${MCP_URL} as type http`);
+need(Object.keys(pluginMcp.mcpServers ?? {}).length === 1, `${CLAUDE_PLUGIN_DIR}/.mcp.json: the plugin adds the hosted server only`);
+hostedOnly(pluginServer, `${CLAUDE_PLUGIN_DIR}/.mcp.json`);
 need(/^[a-z0-9-]+$/.test(market.name ?? ""), "marketplace.json: name must be kebab-case");
 need(market.owner?.name, "marketplace.json: owner.name required");
 const entry = market.plugins?.find((p) => p.name === plugin.name);
 need(entry, "marketplace.json: must list the plugin by its plugin.json name");
-need(entry?.source === "./", "marketplace.json: plugin source must be ./");
+need(market.plugins?.length === 1, "marketplace.json: must list exactly one plugin; a second entry could name the repository root");
+need(entry?.source === `./${CLAUDE_PLUGIN_DIR}`, `marketplace.json: plugin source must be ./${CLAUDE_PLUGIN_DIR}, never the repository root`);
 need(entry && !("version" in entry), "marketplace.json: leave the plugin's version out; plugin.json holds it");
 need(market.metadata?.version === version, "marketplace.json: metadata.version must match package.json");
 
@@ -50,7 +61,7 @@ const remote = mcp.mcpServers?.daymaker;
 need(remote?.type === "http", ".mcp.json: daymaker server must be type http");
 need(remote?.url === MCP_URL, `.mcp.json: url must be ${MCP_URL} (a literal: Devin and Agent Plugins clients do not expand defaults)`);
 hostedOnly(remote, ".mcp.json");
-need(Object.keys(mcp.mcpServers ?? {}).length === 1, ".mcp.json: the plugin adds the hosted server only");
+need(Object.keys(mcp.mcpServers ?? {}).length === 1, ".mcp.json: the hosted server only");
 
 // Devin: .devin-plugin/plugin.json (reads the root .mcp.json by convention)
 const devin = await read(".devin-plugin/plugin.json");

@@ -24,7 +24,7 @@ jobs:
       - name: Every version equals the tag
         run: |
           TAG="${GITHUB_REF_NAME#v}"
-          for f in package.json packages/sdk/package.json packages/mcp/package.json .claude-plugin/plugin.json .claude-plugin/marketplace.json .devin-plugin/plugin.json .antigravity-plugin/plugin.json plugin.json server.json; do
+          for f in package.json packages/sdk/package.json packages/mcp/package.json plugins/daymaker/.claude-plugin/plugin.json .claude-plugin/marketplace.json .devin-plugin/plugin.json .antigravity-plugin/plugin.json plugin.json server.json; do
             node -e "const p=require('./$f');const v=p.version??p.metadata?.version;if(v!=='$TAG'){console.error('$f version '+(v||'missing')+' != tag $TAG');process.exit(1)}"
           done
           node -e "const m=require('./packages/mcp/package.json');if(m.dependencies['@daymaker/sdk']!=='$TAG'){console.error('@daymaker/mcp must depend on @daymaker/sdk $TAG');process.exit(1)}"
@@ -41,6 +41,7 @@ jobs:
       - run: npm run smoke:stdio
       - run: npm run check:public
       # Each step below skips what is already out, so a run that stopped halfway can be run again.
+      # The two npm steps can skip a version only once npm serves it.
       - name: Publish @daymaker/sdk
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -96,6 +97,24 @@ jobs:
           curl -fsSLO "${base}/registry_${PUBLISHER_VERSION}_checksums.txt"
           grep " mcp-publisher_linux_amd64.tar.gz$" "registry_${PUBLISHER_VERSION}_checksums.txt" | sha256sum -c -
           tar xzf mcp-publisher_linux_amd64.tar.gz mcp-publisher
+      - name: Wait until npm serves both packages at this version
+        if: env.MCP_PRIVATE_KEY != ''
+        # npm accepts a publish and can serve it minutes later. The registry looks
+        # @daymaker/mcp up on npm, so publishing the entry straight away is refused. That package
+        # needs @daymaker/sdk at the same version, and npm can serve the two minutes apart, so
+        # the entry waits for both.
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          for i in $(seq 1 60); do
+            if curl -fsS --max-time 20 -o /dev/null "https://registry.npmjs.org/@daymaker%2fsdk/${TAG}" \
+              && curl -fsS --max-time 20 -o /dev/null "https://registry.npmjs.org/@daymaker%2fmcp/${TAG}"; then
+              echo "npm serves @daymaker/sdk@${TAG} and @daymaker/mcp@${TAG}"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "npm does not serve both packages at ${TAG} after 60 tries"
+          exit 1
       - name: Publish server.json
         if: env.MCP_PRIVATE_KEY != ''
         # This version of mcp-publisher reads the key from the flag; newer ones also read MCP_PRIVATE_KEY.

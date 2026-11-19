@@ -32,6 +32,7 @@
     ".antigravity-plugin",
     "examples",
     "packages",
+    "plugins/daymaker",
     "scripts",
     "skills",
     "test",

@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.4.1
+
+- **The Claude Code plugin is now only the plugin.** It has a folder of its
+  own, `plugins/daymaker`, with its manifest, its server file and its
+  skill. In 0.4.0 the plugin was the whole repository, so installing it
+  copied this repository's source into the plugin and, with Claude Code
+  2.1.222, also installed its development packages, about 120 MB. The
+  repository's `bin` folder no longer counts as the plugin's. The install
+  commands are the same. Adding the marketplace still clones this
+  repository, about 2 MB, and nothing in that clone is run or installed.
+- **If you installed 0.4.0**, run these two commands in your shell:
+  `claude plugin marketplace update daymaker`, then
+  `claude plugin update daymaker@daymaker`. If you installed it for one
+  project, run both in that project's folder and add `--scope project` or
+  `--scope local` to the second. Claude Code removes the old copy by
+  itself later.
+- `@daymaker/sdk` and `@daymaker/mcp` now give today's price for research,
+  45 credits, as the API's own description does. 0.4.0 said 37.5. Apart
+  from that and the version number they are unchanged.
+
 ## 0.4.0
 
 The first public release.

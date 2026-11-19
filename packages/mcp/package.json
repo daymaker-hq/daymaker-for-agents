@@ -1,6 +1,6 @@
 {
   "name": "@daymaker/mcp",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Local MCP server (stdio) with one tool per Daymaker API operation.",
   "license": "SEE LICENSE IN LICENSE",
   "type": "module",
@@ -16,7 +16,7 @@
   },
   "mcpName": "com.daymaker/daymaker",
   "bin": {
-    "daymaker-mcp": "./dist/cli.js"
+    "daymaker-mcp": "dist/cli.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -39,7 +39,7 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "@daymaker/sdk": "0.4.0",
+    "@daymaker/sdk": "0.4.1",
     "@modelcontextprotocol/sdk": "^1.32.0"
   },
   "keywords": [

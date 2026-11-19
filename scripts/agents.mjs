@@ -1,6 +1,6 @@
 // One table of agent clients -> the connect config each one wants.
 //
-//   node scripts/agents.mjs            # write examples/agents/** and the README section
+//   node scripts/agents.mjs            # write examples/agents/**, the README section and the plugin's copies of the skill and .mcp.json
 //   node scripts/agents.mjs --check    # exit 1 if any of them is stale
 //
 // There are two ways in, and every entry here is one or both of them:
@@ -236,6 +236,16 @@ export const AGENTS = [
 
 export const AGENTS_DIR = "examples/agents";
 
+/**
+ * The Claude Code plugin's own folder. Claude Code copies the folder the marketplace entry names to the
+ * person's machine, whole, and can install the packages of a package.json and lockfile it finds there. So
+ * this folder holds the plugin's manifest, its server file and its skill and nothing else: no package.json,
+ * no bin folder.
+ */
+export const CLAUDE_PLUGIN_DIR = "plugins/daymaker";
+/** The skill every plugin system reads from the root. The Claude Code plugin carries a copy of it, and of the root .mcp.json. */
+export const SKILL_FILE = "skills/daymaker/SKILL.md";
+
 /** `[path relative to repo root, content]` for every generated example. */
 export function renderExamples() {
   return AGENTS.flatMap((a) => Object.entries(a.files).map(([f, content]) => [`${AGENTS_DIR}/${a.id}/${f}`, content]));
@@ -288,6 +298,8 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const want = new Map(renderExamples());
   const readmePath = join(root, "README.md");
   want.set("README.md", spliceReadme(lf(await readFile(readmePath, "utf8")), renderReadmeSection()));
+  want.set(`${CLAUDE_PLUGIN_DIR}/${SKILL_FILE}`, lf(await readFile(join(root, SKILL_FILE), "utf8")));
+  want.set(`${CLAUDE_PLUGIN_DIR}/.mcp.json`, lf(await readFile(join(root, ".mcp.json"), "utf8")));
   for (const [rel, content] of want) {
     const p = join(root, rel);
     const current = lf(await readFile(p, "utf8").catch(() => null));

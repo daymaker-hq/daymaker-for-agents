@@ -1,7 +1,7 @@
 {
   "name": "daymaker-for-agents",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Daymaker for Claude Code and other agent clients: plugins, a local MCP server and a typed SDK for the Daymaker API.",
   "license": "SEE LICENSE IN LICENSE",
   "type": "module",

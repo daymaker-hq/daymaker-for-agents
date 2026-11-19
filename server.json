@@ -3,7 +3,7 @@
   "name": "com.daymaker/daymaker",
   "title": "Daymaker",
   "description": "Research leads, pick gifts they would love and send them, as you, in your Daymaker workspace.",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "websiteUrl": "https://daymaker.com",
   "repository": {
     "source": "github",
@@ -20,7 +20,7 @@
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@daymaker/mcp",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "transport": {
         "type": "stdio"
       },

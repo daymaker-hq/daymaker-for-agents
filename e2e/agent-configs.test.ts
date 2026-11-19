@@ -104,8 +104,8 @@ describe("examples/agents", () => {
     expect(config).toEqual({ name: REMOTE_NAME, type: "http", url: MCP_URL });
   });
 
-  it("the Claude Code example is the plugin's own server file", async () => {
-    const pluginMcp = lf(await readFile(join(ROOT, ".mcp.json"), "utf8"));
-    expect(JSON.parse(pluginMcp)).toEqual(JSON.parse(AGENTS.find((a) => a.id === "claude-code")!.files[".mcp.json"]!));
+  it("the Claude Code example is this repository's own .mcp.json", async () => {
+    const rootMcp = lf(await readFile(join(ROOT, ".mcp.json"), "utf8"));
+    expect(JSON.parse(rootMcp)).toEqual(JSON.parse(AGENTS.find((a) => a.id === "claude-code")!.files[".mcp.json"]!));
   });
 });

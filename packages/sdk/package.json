@@ -1,6 +1,6 @@
 {
   "name": "@daymaker/sdk",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Typed client for the Daymaker API (https://daymaker.com/api/v2).",
   "license": "SEE LICENSE IN LICENSE",
   "type": "module",

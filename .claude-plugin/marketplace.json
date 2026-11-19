@@ -6,12 +6,12 @@
   },
   "metadata": {
     "description": "Daymaker plugins for Claude Code",
-    "version": "0.4.0"
+    "version": "0.4.1"
   },
   "plugins": [
     {
       "name": "daymaker",
-      "source": "./",
+      "source": "./plugins/daymaker",
       "description": "Research leads, pick gifts and send them through the Daymaker MCP server. Sign in with your Daymaker account.",
       "category": "productivity",
       "keywords": [
